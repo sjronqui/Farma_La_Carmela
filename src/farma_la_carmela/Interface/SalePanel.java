@@ -182,19 +182,9 @@ public class SalePanel extends JPanel{
     }
     
         public LinkedList searchMedicina(String name){
-        String query="{call search_medicina('%" + name + "%')}";
+        String query="{call search_articulo('%" + name + "%')}";
         ResultSet rs = DataConection.ejecutarProcedureSelect(query);
         LinkedList list= new LinkedList<String[]>();
-        try {
-            while(rs.next()){
-                list.add(new String[]{rs.getString(1), rs.getString(2),String.valueOf(rs.getInt(3)), String.valueOf(rs.getDouble(4)), rs.getString(5)});                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-        }
-        /*Look*/
-        query="{call search_producto('%" + name + "%')}";
-        rs = DataConection.ejecutarProcedureSelect(query);
         try {
             while(rs.next()){
                 list.add(new String[]{rs.getString(1), rs.getString(2),String.valueOf(rs.getInt(3)), String.valueOf(rs.getDouble(4)), rs.getString(5)});                

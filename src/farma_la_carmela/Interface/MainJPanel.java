@@ -30,6 +30,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
+import java.awt.event.KeyListener;
 import java.sql.Date;
 import java.util.Calendar;
 import javax.swing.BorderFactory;
@@ -37,10 +38,9 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author usuario1
+ * @author Saulitron
  */
 public class MainJPanel extends JPanel{
-    public final String type;
     public int idSelected=0;
     private JLabel lblName;
     private JTextField txtName;
@@ -64,8 +64,7 @@ public class MainJPanel extends JPanel{
     private JDateChooser txtExp;
     
     
-    public MainJPanel(String ty){
-        this.type=ty;
+    public MainJPanel(){
         String[] itemsC;
         String[] itemsP;
         SpringLayout mgr= new SpringLayout();
@@ -195,183 +194,66 @@ public class MainJPanel extends JPanel{
         mgr.putConstraint(SpringLayout.NORTH,btnMod,5,SpringLayout.SOUTH,txtRest);
         
         this.setLayout(mgr);
-        switch (type){
-            case "Medicinas":
-                itemsC = new String[]{"Resfriado","Rehidratacion","Diarrea","Estomago","Limpieza de Heridas","Llagas","Tos","Goteros",
-                    "Vitaminas","Alergia","Presion","Antiflamatorio","Diabetes","Analgesicos","Colicos","Colesterol-Trigliceridos",
-                    "Antibioticos","Vias Urinarias","Ampollas","Estrenimiento","Hongos","Hormonas","Vomito/Mareo","Ovulos",
-                    "Cremas","Parasitos","Diureticos","Otros"};
-                this.setCategories(itemsC);
-                
-                itemsP=new String[]{"Tableta","Tableta Masticable","Tableta Efervecente","Frasco","Sache","Jarabe",
-                    "Sobre","Supositorio","Ampolla Bebible","Ampolla Inyectable","Ampolla de Inhalacion","Suspension",
-                    "Gotas", "Unguento","Crema","Rollo","Tira","Caja",
-                    "Otros"};
-                this.setPresentations(itemsP);
-                break;
-                
-            case "Productos":
-                itemsC = new String[]{"Default"};
-                this.setCategories(itemsC);
-                this.txtComp.setVisible(false);
-                this.txtComp.setRows(1);
-                this.lblComp.setVisible(false);
-                itemsP=new String[]{"Default"};
-                this.setPresentations(itemsP);
-                break;
-        }
-    }
-    
-    
-    public void controller(ActionListener ctr){
-        this.btnNew.addActionListener(ctr);
-        this.btnMod.addActionListener(ctr);
         
-        switch (type){
-            case "Medicinas":
-                this.btnNew.setActionCommand("NEW_MED");
-                this.btnMod.setActionCommand("MOD_MED");
-                this.txtName.addKeyListener(new KeyAdapter() {
-                    public void keyReleased(KeyEvent e) {
-                        setTable(searchMedicina(getNombre()));
-                        table.setEnabled(true);
-                        btnNew.setEnabled(true);
-                    }
-                    public void keyTyped(KeyEvent e) {
-                    }
-                    public void keyPressed(KeyEvent e) {
-                    }
-                });
-                this.table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        if(table.getSelectedRow()>=0){
-                            btnMod.setEnabled(true);
-                            btnNew.setEnabled(false);
-                            setMedicine((String)table.getValueAt(table.getSelectedRow(),0),(String)table.getValueAt(table.getSelectedRow(),1));
-                        }
-                    }
-                    
-                });
-                break;
-            case "Productos":
-                this.btnNew.setActionCommand("NEW_PRO");
-                this.txtName.setActionCommand("SEARCH_PRO");
-                this.txtName.addKeyListener(new KeyAdapter() {
-                    public void keyReleased(KeyEvent e) {
-                        setTable(searchProducto(getNombre()));
-                        table.setEnabled(true);
-                        btnNew.setEnabled(true);
-                    }
-                    public void keyTyped(KeyEvent e) {
-                    }
-                    public void keyPressed(KeyEvent e) {
-                    }
-                });
-                this.table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        if(table.getSelectedRow()>=0){
-                            btnMod.setEnabled(true);
-                            btnNew.setEnabled(false);
-                            setProduct((String)table.getValueAt(table.getSelectedRow(),0),(String)table.getValueAt(table.getSelectedRow(),1));
-                        }
-                    }
-                    
-                });
-                break;
-        }
+        itemsC = new String[]{"Resfriado","Rehidratacion","Diarrea","Estomago","Limpieza de Heridas","Llagas","Tos","Goteros",
+            "Vitaminas","Alergia","Presion","Antiflamatorio","Diabetes","Analgesicos","Colicos","Colesterol-Trigliceridos",
+            "Antibioticos","Vias Urinarias","Ampollas","Estrenimiento","Hongos","Hormonas","Vomito/Mareo","Ovulos",
+            "Cremas","Parasitos","Diureticos","Otros"};
+        this.setCategories(itemsC);
+
+        itemsP=new String[]{"Tableta","Tableta Masticable","Tableta Efervecente","Frasco","Sache","Jarabe",
+            "Sobre","Supositorio","Ampolla Bebible","Ampolla Inyectable","Ampolla de Inhalacion","Suspension",
+            "Gotas", "Unguento","Crema","Rollo","Tira","Caja",
+            "Otros"};
+        this.setPresentations(itemsP);
+
     }
     
     
-    public LinkedList searchMedicina(String name){
-        String query="{call search_medicina('%" + name + "%')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-        LinkedList list= new LinkedList<String[]>();
-        try {
-            while(rs.next()){
-                list.add(new String[]{rs.getString(1), rs.getString(2),String.valueOf(rs.getInt(3)), String.valueOf(rs.getDouble(4)), rs.getString(5)});                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
+    public void controller(ActionListener ctr1,KeyListener ctr2,ListSelectionListener ctr3){
+        this.btnNew.addActionListener(ctr1);
+        this.btnMod.addActionListener(ctr1);
+        this.btnNew.setActionCommand("NEW");
+        this.btnMod.setActionCommand("MOD");
+        this.txtName.addKeyListener(ctr2);
+        this.table.getSelectionModel().addListSelectionListener(ctr3);
+       
         }
-        return list;
-    }
-    
-    public LinkedList searchProducto(String name){
-        String query="{call search_producto('%" + name + "%')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-        LinkedList list= new LinkedList<String[]>();
-        try {
-            while(rs.next()){
-                list.add(new String[]{rs.getString(1), rs.getString(2),String.valueOf(rs.getInt(3)), String.valueOf(rs.getDouble(4)), rs.getString(5)});                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-        }
-        return list;
-    }
-    
-    public void setTable(LinkedList lista){
-        DefaultTableModel dtm=(DefaultTableModel)
-        table.getModel();dtm.setRowCount(0);
-        table.getSelectionModel().clearSelection();
-        while(dtm.getRowCount()>0) dtm.removeRow(0);
-        for(int i= 0; i<lista.size();i++){
-            String[] temp= (String[])lista.get(i);
-            dtm.insertRow(i,temp);        
-        }
-    }
-    
-    private void setMedicine(String name, String pres){
-        String query="{call find_medicina('" + name + "','"+pres+"')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-        try {
-            while(rs.next()){
-                this.idSelected=rs.getInt(1);
-                this.txtName.setText(rs.getString(2));
-                this.cbPres.setSelectedItem(rs.getString(3));
-                this.txtStock.setText(rs.getString(5));
-                this.txtCost.setText(rs.getString(7));
-                this.txtPvp.setText(rs.getString(8));
-                this.cbCat.setSelectedItem(rs.getString(11));
-                this.txtRest.setText(rs.getString(12));
-                this.txtExp.setDate(rs.getDate(10));
-                StringBuilder sb=new StringBuilder();
-                query = "{call get_gen_med('" + rs.getInt(1)+"')}";
-                rs = DataConection.ejecutarProcedureSelect(query);
-                while(rs.next()){
-                        sb.append(rs.getString(2)+"\n");
-                }
-                this.txtComp.setText(sb.toString());
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-        }
-    }
     
     
-    private void setProduct(String name, String pres){
-        String query="{call find_producto('" + name + "','"+pres+"')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-        try {
-            System.out.println("EStoy fuera");
-            while(rs.next()){
-                System.out.println("EStoy adentro");
-                this.idSelected=rs.getInt(1);
-                this.txtName.setText(rs.getString(2));
-                this.cbPres.setSelectedItem(rs.getString(3));
-                this.txtStock.setText(rs.getString(5));
-                this.txtCost.setText(rs.getString(7));
-                this.txtPvp.setText(rs.getString(8));
-                this.cbCat.setSelectedItem(rs.getString(11));
-                this.txtRest.setText(rs.getString(12));
-                this.txtExp.setDate(rs.getDate(10));
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-        }
-    }
+    
+    
+    
+    
+  
+//    
+//    private void setMedicine(String name, String pres){
+//        String query="{call find_medicina('" + name + "','"+pres+"')}";
+//        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
+//        try {
+//            while(rs.next()){
+//                this.idSelected=rs.getInt(1);
+//                this.txtName.setText(rs.getString(2));
+//                this.cbPres.setSelectedItem(rs.getString(3));
+//                this.txtStock.setText(rs.getString(5));
+//                this.txtCost.setText(rs.getString(7));
+//                this.txtPvp.setText(rs.getString(8));
+//                this.cbCat.setSelectedItem(rs.getString(11));
+//                this.txtRest.setText(rs.getString(12));
+//                this.txtExp.setDate(rs.getDate(10));
+//                StringBuilder sb=new StringBuilder();
+//                query = "{call get_gen_med('" + rs.getInt(1)+"')}";
+//                rs = DataConection.ejecutarProcedureSelect(query);
+//                while(rs.next()){
+//                        sb.append(rs.getString(2)+"\n");
+//                }
+//                this.txtComp.setText(sb.toString());
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
+//        }
+//    }
+    
     
     public Date getExpDate(){
         return new java.sql.Date(this.txtExp.getDate().getTime());
@@ -423,7 +305,56 @@ public class MainJPanel extends JPanel{
         }
         
     }
+
+    public JTable getTable() {
+        return table;
+    }
+
+    public JButton getBtnNew() {
+        return btnNew;
+    }
+
+    public JButton getBtnMod() {
+        return btnMod;
+    }
     
+    public void setCategory(String item){
+            this.cbCat.setSelectedItem(item);
+    }
+    
+    public void setStock(String i){
+        this.txtStock.setText(i);
+        
+    }
+    public void setComp(String i){
+        this.txtComp.setText(i);
+        
+    }
+    public void setCost(String i){
+        this.txtCost.setText(i);
+        
+    }
+    
+    public void setPvp(String i){
+        this.txtPvp.setText(i);
+        
+    }
+    public void setRest(String i){
+        this.txtRest.setText(i);
+        
+    }
+    public void setExp(Date i){
+        this.txtExp.setDate(i);
+        
+    }
+    public void setNombre(String i){
+        this.txtName.setText(i);
+        
+    }
+    
+    public void setPresentation(String item){
+            this.cbPres.setSelectedItem(item);
+    }
     public void setCategories(String[] items){
         for (String item: items){
             this.cbCat.addItem(item);

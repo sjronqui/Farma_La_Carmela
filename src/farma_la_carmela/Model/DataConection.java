@@ -9,7 +9,7 @@ public  class DataConection{
 
     private static Connection con;
     private static DataConection INSTANCE = null;
-    static String connectionUrl = "jdbc:mysql://localhost:3306/carmela";
+    static String connectionUrl = "jdbc:mysql://localhost:3306/farmacia";
 
     public DataConection(){
     	

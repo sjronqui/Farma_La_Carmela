@@ -1,7 +1,9 @@
 package farma_la_carmela.Interface;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import javax.swing.JPanel;
+import javax.swing.event.ListSelectionListener;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,31 +15,26 @@ import javax.swing.JPanel;
  * @author usuario1
  */
 public class MainJFrame extends javax.swing.JFrame {
-    private MainJPanel panelMed;
-    private MainJPanel panelPro;
+    private MainJPanel panelArticulo;
     private SalePanel panelSale;
     
-    public MainJPanel getPanelMed() {
-        return panelMed;
+    public MainJPanel getPanelArticulo() {
+        return panelArticulo;
     }
 
-    public MainJPanel getPanelPro() {
-        return panelPro;
-    }
     
     /**
      * Creates new form MainJFrame
      */
     public MainJFrame() {
-        panelMed=new MainJPanel("Medicinas");
-        panelPro=new MainJPanel("Productos");
+        panelArticulo=new MainJPanel();
+        
         panelSale=new SalePanel();
         JPanel panelCaja=new JPanel();
-                initComponents();
+        initComponents();
         this.panel_vendedor.addTab("Ventas", panelSale);
         this.panel_vendedor.addTab("Caja", panelCaja);
-        this.panel_Inventario.addTab("Medicinas",panelMed);
-        this.panel_Inventario.addTab("Productos",panelPro);
+        this.panel_Inventario.addTab("Articulos",panelArticulo);
     }
 
     /**
@@ -184,10 +181,9 @@ public class MainJFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public void controller(ActionListener ctr){
-        panelMed.controller(ctr);
-        panelPro.controller(ctr);
-        panelSale.controller(ctr);
+    public void controller(ActionListener ctr1,KeyListener ctr2,ListSelectionListener ctr3){
+        panelArticulo.controller(ctr1,ctr2,ctr3);
+        panelSale.controller(ctr1);
     }
     /**
      * @param args the command line arguments
