@@ -7,15 +7,13 @@ package farma_la_carmela.controller;
 
 import farma_la_carmela.Interface.MainJFrame;
 import farma_la_carmela.Interface.MainJPanel;
+import farma_la_carmela.Interface.SalePanel;
+import farma_la_carmela.Model.Article;
 import farma_la_carmela.Model.ArticleList;
-import farma_la_carmela.Model.DataConection;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -24,45 +22,47 @@ import javax.swing.table.DefaultTableModel;
  * @author Saulitron
  */
 public class SearchController implements KeyListener{
-     private String query;
     private MainJPanel panel;
+    private SalePanel panelS;
     private ArticleList articulos;
     
-    public SearchController(MainJFrame viewApp, ArticleList articulos){
+    public SearchController(MainJFrame viewApp){
        this.panel = viewApp.getPanelArticulo();
-       this.articulos=articulos;
+       this.panelS=viewApp.getPanelSale();
+       this.articulos=viewApp.getArticulos();
     }
     
-    public LinkedList searchMedicina(String name){
-        String query="{call search_articulo('%" + name + "%')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
+    public LinkedList searchArticulo(String name){
         LinkedList list= new LinkedList<String[]>();
-        try {
-            while(rs.next()){
-                list.add(new String[]{rs.getString(1), rs.getString(2),String.valueOf(rs.getInt(3)), String.valueOf(rs.getDouble(4)), rs.getString(5)});                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
+        ArticleList subList=this.articulos.getArticles(name);
+        Iterator<Article> itr = subList.iterator();
+        while(itr.hasNext()){
+            Article tmp=itr.next();
+            list.add(new String[]{String.valueOf(tmp.getId()),tmp.getNombre(),tmp.getPresentacion(),String.valueOf(tmp.getStock()), String.valueOf(tmp.getPvp()), String.valueOf(tmp.getFecha_caducidad()),tmp.getCategoria()});
         }
         return list;
     }
     
-      public void setTable(LinkedList lista){
-          JTable table = panel.getTable();
-        DefaultTableModel dtm=(DefaultTableModel)
-        table.getModel();dtm.setRowCount(0);
+      public void setTable(LinkedList lista,JTable table){
+        DefaultTableModel dtm=(DefaultTableModel)table.getModel();
+        dtm.setRowCount(0);
         table.getSelectionModel().clearSelection();
         while(dtm.getRowCount()>0) dtm.removeRow(0);
         for(int i= 0; i<lista.size();i++){
             String[] temp= (String[])lista.get(i);
-            dtm.insertRow(i,temp);        
+            dtm.insertRow(i,temp);    
         }
     }
       
     public void keyReleased(KeyEvent e) {
-        setTable(searchMedicina(panel.getNombre()));
-        panel.getTable().setEnabled(true);
-        panel.getBtnNew().setEnabled(true);
+        if(e.getComponent().getParent() instanceof MainJPanel){
+            setTable(searchArticulo(panel.getNombre().toUpperCase()),panel.getTable());
+            panel.getTable().setEnabled(true);
+            panel.getBtnNew().setEnabled(true);
+        }else if(e.getComponent().getParent() instanceof SalePanel){
+            setTable(searchArticulo(panelS.getNombre().toUpperCase()),panelS.getTable());
+            panelS.getTable().setEnabled(true);
+        }
     }
     public void keyTyped(KeyEvent e) {
     }

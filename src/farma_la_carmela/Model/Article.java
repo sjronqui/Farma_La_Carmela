@@ -44,7 +44,7 @@ public class Article {
         this.categoria=categoria;
         this.restriccion = restriccion;
         
-        query ="call insert_articulo('" + nombre +"','"+presentacion+"','" + cod_barras +"','" + stock +"','"+stock_min+"','"+costo+"','"+pvp+"','"+fecha_ingreso+"','"+fecha_caducidad+"','"+categoria+"','"+restriccion+"')";
+        query ="call insert_articulo('" + nombre +"','"+presentacion+"'," + cod_barras +"," + stock +","+stock_min+","+costo+","+pvp+",'"+fecha_ingreso+"','"+fecha_caducidad+"','"+categoria+"','"+restriccion+"')";
         DataConection.ejecutarprocedure(query);
                 
         query ="select last_insert_id() as last_id from Articulo";
@@ -54,12 +54,12 @@ public class Article {
             if(rs.next()){
                 this.id=rs.getInt("last_id");
                 for(String generico: Componentes){  
-                    query="{call find_generico('" + generico + "')}";
+                    query="{call find_generico('" + generico.toUpperCase() + "')}";
                     rs = DataConection.ejecutarProcedureSelect(query);
                     if(!rs.next()){
-                        query="{call insert_generico('" + generico+"')}";
+                        query="{call insert_generico('" + generico.toUpperCase()+"')}";
                         DataConection.ejecutarProcedureSelect(query);
-                        query="{call find_generico('" + generico + "')}";
+                        query="{call find_generico('" + generico.toUpperCase() + "')}";
                         rs = DataConection.ejecutarProcedureSelect(query);
                         rs.next();
                     }    
@@ -75,8 +75,8 @@ public class Article {
      
     public Article(int id,String nombre, String presentacion, String cod_barras, int stock, int stock_min, double costo, double pvp, Date fecha_ingreso, Date fecha_caducidad, String categoria, String restriccion, String[] Componentes) {
         this.id=id;
-        this.nombre = nombre;
-        this.presentacion = presentacion;
+        this.nombre = nombre.toUpperCase();
+        this.presentacion = presentacion.toUpperCase();
         this.cod_barras = cod_barras;
         this.stock = stock;
         this.stock_min = stock_min;
@@ -84,8 +84,8 @@ public class Article {
         this.pvp = pvp;
         this.fecha_ingreso = fecha_ingreso;
         this.fecha_caducidad = fecha_caducidad;
-        this.categoria=categoria;
-        this.restriccion = restriccion;  
+        this.categoria=categoria.toUpperCase();
+        this.restriccion = restriccion.toUpperCase();  
     } 
      
     public String getNombre() {
@@ -188,13 +188,52 @@ public class Article {
     }
     
     private void updateArticle(){
-         query="{call update_article(" +this.id+",'"+ this.nombre+ "','"+this.presentacion+"',"+this.cod_barras+","+this.stock+","+this.stock_min+","+this.costo+","+this.pvp+",'"+ this.fecha_caducidad+"','"+this.categoria+"','"+this.restriccion+"')}";
+         query="{call update_articulo(" +this.id+",'"+ this.nombre+ "','"+this.presentacion+"','"+this.cod_barras+"',"+this.stock+","+this.stock_min+","+this.costo+","+this.pvp+",'"+ this.fecha_caducidad+"','"+this.categoria+"','"+this.restriccion+"')}";
          DataConection.ejecutarprocedure(query);
+    }
+    
+    public void updateArticle(String n, String p, String cb,int s,int sm,double c, double pvp, Date exp, String ca,String r,String[] comp){
+         this.nombre=n;
+         this.presentacion=p;
+         this.cod_barras=cb;
+         this.stock=s;
+         this.stock_min=sm;
+         this.costo=c;
+         this.pvp=pvp;
+         this.fecha_caducidad=exp;
+         this.categoria=ca;
+         this.restriccion=r;
+         this.updateArticle();
+         this.updateComponentes(comp);
+    }
+    
+    public void updateComponentes(String[] Componentes){
+        query="delete from Generico_Articulo where id="+this.id+";";
+        DataConection.ejecutarprocedure(query);
+        try {
+            for(String generico: Componentes){  
+                query="{call find_generico('" + generico.toUpperCase() + "')}";
+                ResultSet rs = DataConection.ejecutarProcedureSelect(query);
+                if(!rs.next()){
+                    query="{call insert_generico('" + generico.toUpperCase()+"')}";
+                    DataConection.ejecutarProcedureSelect(query);
+                    query="{call find_generico('" + generico.toUpperCase() + "')}";
+                    rs = DataConection.ejecutarProcedureSelect(query);
+                    rs.next();
+                }    
+                    int id_gen=rs.getInt(1);
+                    query="{call insert_gen_art(" + id + ","+id_gen+")}";
+                    DataConection.ejecutarprocedure(query);
+            }    
+        } catch (SQLException ex) {
+            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
+        }
     }
     
     public void buy(int idc,Date f,int cant){
         query="{call insert_compra_articulo("+this.id+","+idc+",'"+f+"',"+cant+")}";
         DataConection.ejecutarprocedure(query);
+        this.stock=stock-cant;
     }
     
     

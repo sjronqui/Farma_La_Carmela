@@ -7,14 +7,12 @@ package farma_la_carmela.Interface;
 
 import farma_la_carmela.Model.DataConection;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,10 +24,11 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
- * @author usuario1
+ * @author Saulitron
  */
 public class SalePanel extends JPanel{
         private JLabel lblName;
@@ -37,9 +36,16 @@ public class SalePanel extends JPanel{
     private JTable table;
     private JButton btnAdd;
     private JButton btnDel;
+    private JButton btnBuy;
     private JTable tbFactura;
+    private JLabel valor;
+    private JLabel cambio;
+    private JTextField efectivo;
+    
+    public int numArticulos;
     
     public SalePanel(){
+        this.numArticulos=0;
         SpringLayout mgr= new SpringLayout();
         
         lblName=new JLabel("Buscar: ");
@@ -53,7 +59,7 @@ public class SalePanel extends JPanel{
         mgr.putConstraint(SpringLayout.NORTH,txtName,5,SpringLayout.NORTH,this);
         
         
-        String columNames[] = {"Nombre","Presentacion","Stock" ,"Precio" ,"Categoria"};
+        String columNames[] = {"Cod","Nombre","Presentacion","Stock" ,"Precio","Fecha de Expiracion" ,"Categoria"};
         DefaultTableModel dtm = new DefaultTableModel(columNames,5);
         table = new JTable(dtm);
         table.setPreferredScrollableViewportSize(new Dimension(590,80));
@@ -62,21 +68,34 @@ public class SalePanel extends JPanel{
         JScrollPane scroll = new JScrollPane(table);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        TableColumnModel columna = table.getColumnModel();
+        columna.getColumn(0).setPreferredWidth(10);
+        columna.getColumn(1).setPreferredWidth(140);
+        columna.getColumn(2).setPreferredWidth(80);
+        columna.getColumn(3).setPreferredWidth(10);
+        columna.getColumn(4).setPreferredWidth(10);
+        columna.getColumn(5).setPreferredWidth(40);
+//        columna.getColumn(6).setPreferredWidth(10);
         
         this.add(scroll);
         mgr.putConstraint(SpringLayout.WEST,scroll,5, SpringLayout.WEST, this);
         mgr.putConstraint(SpringLayout.NORTH,scroll,9,SpringLayout.SOUTH,lblName);
         
         
-        String columNames2[] = {"Cant.","Articulo","Precio\n Unitario","Precio\n Total"};
-        DefaultTableModel dtm2 = new DefaultTableModel(columNames2,10);
+        String columNames2[] = {"Cant.","Cod.","Articulo","Pr.Uni.","Pr.Tot."};
+        DefaultTableModel dtm2 = new DefaultTableModel(columNames2,0);
         tbFactura = new JTable(dtm2);
-        tbFactura.setPreferredScrollableViewportSize(new Dimension(290,160));
+        tbFactura.setPreferredScrollableViewportSize(new Dimension(350,180));
         tbFactura.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        tbFactura.setEnabled(false);
         JScrollPane scFactura = new JScrollPane(tbFactura);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        columna = tbFactura.getColumnModel();
+        columna.getColumn(0).setPreferredWidth(10);
+        columna.getColumn(1).setPreferredWidth(10);
+        columna.getColumn(2).setPreferredWidth(80);
+        columna.getColumn(3).setPreferredWidth(10);
+        columna.getColumn(4).setPreferredWidth(10);
         
         this.add(scFactura);
         mgr.putConstraint(SpringLayout.WEST,scFactura,5, SpringLayout.WEST, this);
@@ -88,72 +107,123 @@ public class SalePanel extends JPanel{
         mgr.putConstraint(SpringLayout.WEST,btnAdd,5, SpringLayout.EAST, scFactura);
         mgr.putConstraint(SpringLayout.NORTH,btnAdd,9,SpringLayout.SOUTH,scroll);
         
-        btnDel=new JButton("Quitar");
+        btnDel=new JButton(" Quitar  ");
         btnDel.setEnabled(false);
         this.add(btnDel);
         mgr.putConstraint(SpringLayout.WEST,btnDel,5, SpringLayout.EAST, scFactura);
         mgr.putConstraint(SpringLayout.NORTH,btnDel,9,SpringLayout.SOUTH,btnAdd);
         
-        JLabel lblTotal=new JLabel("Total: ");
-        this.add(lblTotal);
-        mgr.putConstraint(SpringLayout.WEST,lblTotal,5, SpringLayout.WEST, this);
-        mgr.putConstraint(SpringLayout.NORTH,lblTotal,9,SpringLayout.SOUTH,scFactura);
-
-        JLabel valor=new JLabel("0.00");
+        btnBuy=new JButton("Comprar");
+        btnBuy.setEnabled(false);
+        this.add(btnBuy);
+        mgr.putConstraint(SpringLayout.WEST,btnBuy,5, SpringLayout.EAST, scFactura);
+        mgr.putConstraint(SpringLayout.SOUTH,btnBuy,0,SpringLayout.SOUTH,scFactura);
+        
+        valor=new JLabel("0.00");
+        valor.setFont(new Font("Verdana", Font.BOLD, 16));
         this.add(valor);
-        mgr.putConstraint(SpringLayout.WEST,valor,5, SpringLayout.EAST,lblTotal);
+        mgr.putConstraint(SpringLayout.EAST,valor,-5, SpringLayout.EAST,scFactura);
         mgr.putConstraint(SpringLayout.NORTH,valor,9,SpringLayout.SOUTH,scFactura);
         
+        JLabel lblTotal=new JLabel("Total: ");
+        lblTotal.setFont(new Font("Verdana", Font.BOLD, 16));
+        this.add(lblTotal);
+        mgr.putConstraint(SpringLayout.EAST,lblTotal,-5, SpringLayout.WEST, valor);
+        mgr.putConstraint(SpringLayout.NORTH,lblTotal,9,SpringLayout.SOUTH,scFactura);
+        
+        efectivo=new JTextField(4);
+        efectivo.setFont(new Font("Verdana", Font.BOLD, 16));
+        this.add(efectivo);
+        mgr.putConstraint(SpringLayout.EAST,efectivo,-5, SpringLayout.EAST,scFactura);
+        mgr.putConstraint(SpringLayout.NORTH,efectivo,5,SpringLayout.SOUTH,valor);
+        
+        JLabel lblEfectivo=new JLabel("Efectivo: ");
+        lblEfectivo.setFont(new Font("Verdana", Font.BOLD, 16));
+        this.add(lblEfectivo);
+        mgr.putConstraint(SpringLayout.EAST,lblEfectivo,-5, SpringLayout.WEST, efectivo);
+        mgr.putConstraint(SpringLayout.NORTH,lblEfectivo,5,SpringLayout.SOUTH,lblTotal);
+        
+        cambio=new JLabel("0.00");
+        cambio.setFont(new Font("Verdana", Font.BOLD, 16));
+        this.add(cambio);
+        mgr.putConstraint(SpringLayout.EAST,cambio,-5, SpringLayout.EAST,scFactura);
+        mgr.putConstraint(SpringLayout.NORTH,cambio,5,SpringLayout.SOUTH,efectivo);
+        
+        JLabel lblcambio=new JLabel("Cambio: ");
+        lblcambio.setFont(new Font("Verdana", Font.BOLD, 16));
+        this.add(lblcambio);
+        mgr.putConstraint(SpringLayout.EAST,lblcambio,-5, SpringLayout.WEST, cambio);
+        mgr.putConstraint(SpringLayout.NORTH,lblcambio,5,SpringLayout.SOUTH,efectivo);
+
+
         this.setLayout(mgr);
     }
-    
-    private void setMedicine(String name, String pres){
-        String query="{call find_medicina('" + name + "','"+pres+"')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-//        try {
-//            while(rs.next()){
-//                this.idSelected=rs.getInt(1);
-//                this.txtName.setText(rs.getString(2));
-//                this.cbPres.setSelectedItem(rs.getString(3));
-//                this.txtStock.setText(rs.getString(5));
-//                this.txtCost.setText(rs.getString(7));
-//                this.txtPvp.setText(rs.getString(8));
-//                this.cbCat.setSelectedItem(rs.getString(11));
-//                this.txtRest.setText(rs.getString(12));
-//                this.txtExp.setDate(rs.getDate(10));
-//                StringBuilder sb=new StringBuilder();
-//                query = "{call get_gen_med('" + rs.getInt(1)+"')}";
-//                rs = DataConection.ejecutarProcedureSelect(query);
-//                while(rs.next()){
-//                        sb.append(rs.getString(2)+"\n");
-//                }
-//                this.txtComp.setText(sb.toString());
-//            }
-//        } catch (SQLException ex) {
-//            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-//        }
+
+    public void setTotal(double total){
+        this.valor.setText(String.valueOf(total));
     }
-    public void controller(ActionListener ctr){
-        this.txtName.addKeyListener(new KeyAdapter(){
-                    public void keyReleased(KeyEvent e) {
-                        setTable(searchMedicina(txtName.getText()));
-                        table.setEnabled(true);
-                        //btnNew.setEnabled(true);
-                    }
-                    public void keyTyped(KeyEvent e){
-                    }
-                    public void keyPressed(KeyEvent e){
-                    }
-                });
+    public void setEfectivo(double efect){
+        this.efectivo.setText(String.valueOf(efect));
+    }
+    public void setCambio(double efect){
+        this.cambio.setText(String.valueOf(efect));
+    }
+    public JTable getTable() {
+        return table;
+    }
+
+    public JButton getBtnAdd() {
+        return btnAdd;
+    }
+    public JButton getBtnBuy() {
+        return btnBuy;
+    }
+    public JButton getBtnDel() {
+        return btnDel;
+    }
+
+    public JTable getTbFactura() {
+        return tbFactura;
+    }
+    
+    public void controller(ActionListener ctr, KeyListener ctr2){
+        this.btnAdd.addActionListener(ctr);
+        this.btnDel.addActionListener(ctr);
+        this.btnBuy.addActionListener(ctr);
+        this.btnAdd.setActionCommand("ADD");
+        this.btnDel.setActionCommand("DEL");
+        this.btnBuy.setActionCommand("BUY");
         
+        this.txtName.addKeyListener(ctr2);
         
+        this.efectivo.addKeyListener(new KeyListener(){
+            @Override
+            public void keyTyped(KeyEvent e) {
+                
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                if(e.getKeyCode()==KeyEvent.VK_ENTER){
+                    float v =Float.parseFloat(valor.getText());
+                    float t=Float.parseFloat(efectivo.getText());
+                    cambio.setText(String.valueOf(t-v));
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) { //To change body of generated methods, choose Tools | Templates.
+                
+            }
+            
+        });
         this.table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
                         if(table.getSelectedRow()>=0){
                             btnAdd.setEnabled(true);
                             btnDel.setEnabled(false);
-                            //setMedicine((String)table.getValueAt(table.getSelectedRow(),0),(String)table.getValueAt(table.getSelectedRow(),1));
                         }
                     }
                     
@@ -164,36 +234,22 @@ public class SalePanel extends JPanel{
                         if(table.getSelectedRow()>=0){
                             btnAdd.setEnabled(false);
                             btnDel.setEnabled(true);
-                            //setMedicine((String)table.getValueAt(table.getSelectedRow(),0),(String)table.getValueAt(table.getSelectedRow(),1));
                         }
                     }
-                    
                 });
     }
     
-    public void setTable(LinkedList lista){
-        DefaultTableModel dtm=(DefaultTableModel)table.getModel();dtm.setRowCount(0);
-        table.getSelectionModel().clearSelection();
-        while(dtm.getRowCount()>0) dtm.removeRow(0);
-        for(int i= 0; i<lista.size();i++){
-            String[] temp= (String[])lista.get(i);
-            dtm.insertRow(i,temp);        
+        
+        public void incrementNumArticulos(){
+            this.numArticulos++;
         }
-    }
-    
-        public LinkedList searchMedicina(String name){
-        String query="{call search_articulo('%" + name + "%')}";
-        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-        LinkedList list= new LinkedList<String[]>();
-        try {
-            while(rs.next()){
-                list.add(new String[]{rs.getString(1), rs.getString(2),String.valueOf(rs.getInt(3)), String.valueOf(rs.getDouble(4)), rs.getString(5)});                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
+        public void decrementNumArticulos(){
+            this.numArticulos--;
         }
-        return list;
-    }
+        
+        public String getNombre(){
+            return this.txtName.getText();
+        }
 }
 
 

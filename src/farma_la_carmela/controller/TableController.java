@@ -7,8 +7,10 @@ package farma_la_carmela.controller;
 
 import farma_la_carmela.Interface.MainJFrame;
 import farma_la_carmela.Interface.MainJPanel;
+import farma_la_carmela.Model.Article;
 import farma_la_carmela.Model.ArticleList;
 import farma_la_carmela.Model.DataConection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -23,49 +25,71 @@ import javax.swing.event.ListSelectionListener;
  */
 public class TableController implements ListSelectionListener{
         
-         private String query;
+    private String query;
     private MainJPanel panel;
     private ArticleList articulos;
     
-    public TableController(MainJFrame viewApp, ArticleList articulos){
+    public TableController(MainJFrame viewApp){
        this.panel = viewApp.getPanelArticulo();
-       this.articulos=articulos;
+       this.articulos=viewApp.getArticulos();
     }
     
- private void setArticle(String name, String pres){
-        String query="{call find_articulo('" + name + "','"+pres+"')}";
+ private void setArticle(String name, String pres, Date fex){
+     Article tmp=this.articulos.getArticle(name, pres, fex);
+     System.out.println(tmp.getId());
+        panel.idSelected=tmp.getId();
+        panel.setNombre(tmp.getNombre());
+        panel.setPresentation(tmp.getPresentacion());
+        panel.setStock(String.valueOf(tmp.getStock()));
+        panel.setCost(String.valueOf(tmp.getCosto()));
+        panel.setPvp(String.valueOf(tmp.getPvp()));
+        panel.setCategory(tmp.getCategoria());
+        panel.setRest(tmp.getRestriccion());
+        panel.setExp(tmp.getFecha_caducidad());
+        StringBuilder sb=new StringBuilder();
+        query = "{call get_gen_art('" + tmp.getId()+"')}";
         ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-        try {
-            while(rs.next()){
-                panel.idSelected=rs.getInt(1);
-                panel.setNombre(rs.getString(2));
-                panel.setPresentation(rs.getString(3));
-                panel.setStock(rs.getString(5));
-                panel.setCost(rs.getString(7));
-                panel.setPvp(rs.getString(8));
-                panel.setCategory(rs.getString(11));
-                panel.setRest(rs.getString(12));
-                panel.setExp(rs.getDate(10));
-                StringBuilder sb=new StringBuilder();
-                query = "{call get_gen_art('" + rs.getInt(1)+"')}";
-                rs = DataConection.ejecutarProcedureSelect(query);
-                while(rs.next()){
-                        sb.append(rs.getString(2)+"\n");
-                }
-                panel.setComp(sb.toString());
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-        }
+     try {
+         while(rs.next()){
+             sb.append(rs.getString(2)+"\n");
+         }
+     } catch (SQLException ex) {
+         Logger.getLogger(TableController.class.getName()).log(Level.SEVERE, null, ex);
+     }
+        panel.setComp(sb.toString());
     }
     
+  private void setArticle(int id){
+     Article tmp=this.articulos.getArticle(id);
+     
+        panel.idSelected=tmp.getId();
+        panel.setNombre(tmp.getNombre());
+        panel.setPresentation(tmp.getPresentacion());
+        panel.setStock(String.valueOf(tmp.getStock()));
+        panel.setCost(String.valueOf(tmp.getCosto()));
+        panel.setPvp(String.valueOf(tmp.getPvp()));
+        panel.setCategory(tmp.getCategoria());
+        panel.setRest(tmp.getRestriccion());
+        panel.setExp(tmp.getFecha_caducidad());
+        StringBuilder sb=new StringBuilder();
+        query = "{call get_gen_art(" + tmp.getId()+")}";
+        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
+     try {
+         while(rs.next()){
+             sb.append(rs.getString(2)+"\n");
+         }
+     } catch (SQLException ex) {
+         Logger.getLogger(TableController.class.getName()).log(Level.SEVERE, null, ex);
+     }
+        panel.setComp(sb.toString());
+    }
     @Override
     public void valueChanged(ListSelectionEvent e) {
         JTable table=panel.getTable();
         if(table.getSelectedRow()>=0){
             panel.getBtnMod().setEnabled(true);
             panel.getBtnNew().setEnabled(false);
-            setArticle((String)table.getValueAt(table.getSelectedRow(),0),(String)table.getValueAt(table.getSelectedRow(),1));
+            setArticle(Integer.parseInt((String)table.getValueAt(table.getSelectedRow(),0)));
         }
     }
         

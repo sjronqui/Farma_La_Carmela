@@ -10,39 +10,40 @@ public  class DataConection{
     private static Connection con;
     private static DataConection INSTANCE = null;
     static String connectionUrl = "jdbc:mysql://localhost:3306/farmacia";
-
+    private String user;
+    private static String pass;
+    
     public DataConection(){
-    	
     }
 	
 
-	public static void performConnection() {
+	public static boolean performConnection(String user,String pass) {
 		
-		String user = "saulitron";
-		String pass = "1234";
 		  try{
 	            Class.forName("com.mysql.jdbc.Driver").newInstance();
 	            con = DriverManager.getConnection(connectionUrl, user,pass);
 	            JOptionPane.showMessageDialog(null, "Conexion Establecida");
+                    return true;
 	            	        
 	        }catch(Exception e){
 	            e.printStackTrace();
 	            JOptionPane.showMessageDialog(null, "Error in Conexion");
+                    return false;
 	        }
 		
 	}
 	
 
-	private synchronized static void createInstance() {
+	private synchronized static void createInstance(String user,String pass) {
 	        if (INSTANCE == null) { 
 	            INSTANCE = new DataConection();
-	            performConnection();
+	            performConnection(user,pass);
 	        }
 	    }
 	 
 
-	public static DataConection getInstance() {
-	        if (INSTANCE == null) createInstance();
+	public static DataConection getInstance(String user,String pass) {
+	        if (INSTANCE == null) createInstance(user,pass);
 	        return INSTANCE;
 	    }
 	

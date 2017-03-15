@@ -5,16 +5,8 @@
  */
 package farma_la_carmela.Interface;
 
-import farma_la_carmela.Model.DataConection;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -25,7 +17,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
@@ -35,6 +26,8 @@ import java.sql.Date;
 import java.util.Calendar;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
@@ -69,7 +62,7 @@ public class MainJPanel extends JPanel{
         String[] itemsP;
         SpringLayout mgr= new SpringLayout();
         
-        String columNames[] = {"Nombre","Presentacion","Stock" ,"P.V.P." ,"Categoria"};
+        String columNames[] = {"Cod.","Nombre","Presentacion","Stock" ,"P.V.P.","Fecha de Expiracion" ,"Categoria"};
         
         DefaultTableModel dtm = new DefaultTableModel(columNames,5);
         
@@ -80,7 +73,14 @@ public class MainJPanel extends JPanel{
         JScrollPane scroll = new JScrollPane(table);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        
+        TableColumnModel columna = table.getColumnModel();
+        columna.getColumn(0).setPreferredWidth(10);
+        columna.getColumn(1).setPreferredWidth(140);
+        columna.getColumn(2).setPreferredWidth(80);
+        columna.getColumn(3).setPreferredWidth(10);
+        columna.getColumn(4).setPreferredWidth(10);
+        columna.getColumn(5).setPreferredWidth(40);
+      
         this.add(scroll);
         mgr.putConstraint(SpringLayout.WEST,scroll,5, SpringLayout.WEST, this);
         mgr.putConstraint(SpringLayout.NORTH,scroll,9,SpringLayout.NORTH,this);
@@ -172,7 +172,7 @@ public class MainJPanel extends JPanel{
         mgr.putConstraint(SpringLayout.NORTH,lblExp,9,SpringLayout.SOUTH,txtRest);
         
         txtExp=new JDateChooser();
-        txtExp.setDateFormatString("dd/MM/yyyy");
+        txtExp.setDateFormatString("yyyy-MM-dd");
         Calendar clndr= Calendar.getInstance();
         txtExp.setPreferredSize(new Dimension(100,20));
         clndr.add(Calendar.YEAR, 1);
@@ -195,20 +195,19 @@ public class MainJPanel extends JPanel{
         
         this.setLayout(mgr);
         
-        itemsC = new String[]{"Resfriado","Rehidratacion","Diarrea","Estomago","Limpieza de Heridas","Llagas","Tos","Goteros",
-            "Vitaminas","Alergia","Presion","Antiflamatorio","Diabetes","Analgesicos","Colicos","Colesterol-Trigliceridos",
-            "Antibioticos","Vias Urinarias","Ampollas","Estrenimiento","Hongos","Hormonas","Vomito/Mareo","Ovulos",
-            "Cremas","Parasitos","Diureticos","Otros"};
+        itemsC = new String[]{"RESFRIADO","REHIDRATACION","DIARREA","ESTOMAGO","LIMPIEZA DE HERIDAS","LLAGAS","TOS","GOTEROS",
+            "VITAMINAS","ALERGIA","PRESION","ANTIFLAMATORIO","DIABETES","ANALGESICOS","COLICOS","COLESTEROL","TRIGLICERIDOS",
+            "ANTIBIOTICOS","VIAS URINARIAS","AMPOLLAS","ESTRENIMIENTO","HONGOS","HORMONAS","VOMITO/MAREO","OVULOS",
+            "CREMAS","PARASITOS","PSICOTROPICOS","DIURETICOS","BEBIDAS","PAPELERIA","BEBES","ROPA","FIEBRE","OTROS"};
         this.setCategories(itemsC);
 
-        itemsP=new String[]{"Tableta","Tableta Masticable","Tableta Efervecente","Frasco","Sache","Jarabe",
-            "Sobre","Supositorio","Ampolla Bebible","Ampolla Inyectable","Ampolla de Inhalacion","Suspension",
-            "Gotas", "Unguento","Crema","Rollo","Tira","Caja",
-            "Otros"};
+        itemsP=new String[]{"TABLETA","TABLETA MASTICABLE","TABLETA EFERVECENTE","FRASCO","SACHET","JARABE",
+            "SOBRE","SUPOSITORIO","AMPOLLA BEBIBLE","AMPOLLA INYECTABLE","AMPOLLA DE INHALACION","SUSPENSION",
+            "GOTAS", "UNGUENTO","CREMA","ROLLO","TIRA","CAJA","BARRA","LIQUIDO","POMADA","INHALADOR","EQUIPO",
+            "JALEA", "TARRO","FUNDA","PLIEGO","HOJA","ROLL ON","PAQUETE","GRANEL",
+            "OTROS"};
         this.setPresentations(itemsP);
-
     }
-    
     
     public void controller(ActionListener ctr1,KeyListener ctr2,ListSelectionListener ctr3){
         this.btnNew.addActionListener(ctr1);
@@ -219,42 +218,7 @@ public class MainJPanel extends JPanel{
         this.table.getSelectionModel().addListSelectionListener(ctr3);
        
         }
-    
-    
-    
-    
-    
-    
-  
-//    
-//    private void setMedicine(String name, String pres){
-//        String query="{call find_medicina('" + name + "','"+pres+"')}";
-//        ResultSet rs = DataConection.ejecutarProcedureSelect(query);
-//        try {
-//            while(rs.next()){
-//                this.idSelected=rs.getInt(1);
-//                this.txtName.setText(rs.getString(2));
-//                this.cbPres.setSelectedItem(rs.getString(3));
-//                this.txtStock.setText(rs.getString(5));
-//                this.txtCost.setText(rs.getString(7));
-//                this.txtPvp.setText(rs.getString(8));
-//                this.cbCat.setSelectedItem(rs.getString(11));
-//                this.txtRest.setText(rs.getString(12));
-//                this.txtExp.setDate(rs.getDate(10));
-//                StringBuilder sb=new StringBuilder();
-//                query = "{call get_gen_med('" + rs.getInt(1)+"')}";
-//                rs = DataConection.ejecutarProcedureSelect(query);
-//                while(rs.next()){
-//                        sb.append(rs.getString(2)+"\n");
-//                }
-//                this.txtComp.setText(sb.toString());
-//            }
-//        } catch (SQLException ex) {
-//            Logger.getLogger("Erorr").log(Level.SEVERE, null, ex);
-//        }
-//    }
-    
-    
+
     public Date getExpDate(){
         return new java.sql.Date(this.txtExp.getDate().getTime());
     }
@@ -349,7 +313,6 @@ public class MainJPanel extends JPanel{
     }
     public void setNombre(String i){
         this.txtName.setText(i);
-        
     }
     
     public void setPresentation(String item){

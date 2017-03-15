@@ -1,8 +1,12 @@
 package farma_la_carmela.Interface;
 
+import farma_la_carmela.Model.ArticleList;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.util.Iterator;
+import java.util.LinkedList;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.event.ListSelectionListener;
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -15,26 +19,68 @@ import javax.swing.event.ListSelectionListener;
  * @author usuario1
  */
 public class MainJFrame extends javax.swing.JFrame {
+    private ArticleList articulos;
     private MainJPanel panelArticulo;
     private SalePanel panelSale;
+    private JTabbedPane panel_administrador;
+    private JTabbedPane panel_Inventario;
+    private JTabbedPane panel_vendedor;
+    
     
     public MainJPanel getPanelArticulo() {
         return panelArticulo;
+    }
+    public SalePanel getPanelSale() {
+        return panelSale;
+    }
+    public ArticleList getArticulos() {
+        return articulos;
     }
 
     
     /**
      * Creates new form MainJFrame
      */
-    public MainJFrame() {
-        panelArticulo=new MainJPanel();
-        
-        panelSale=new SalePanel();
-        JPanel panelCaja=new JPanel();
+    public MainJFrame(ArticleList a, LinkedList perfiles) {
+        this.articulos=a;
         initComponents();
+        
+        
+        panel_administrador=new JTabbedPane();  
+        
+        panel_Inventario=new JTabbedPane();
+        panel_administrador.addTab("INVENTARIO",panel_Inventario);
+        
+        panel_vendedor=new JTabbedPane();
+        
+        
+        panelArticulo=new MainJPanel();
+
+        this.panelSale=new SalePanel();
+        JPanel panelCaja=new JPanel();
+
+        this.panel_Inventario.addTab("Articulos",panelArticulo);
         this.panel_vendedor.addTab("Ventas", panelSale);
         this.panel_vendedor.addTab("Caja", panelCaja);
-        this.panel_Inventario.addTab("Articulos",panelArticulo);
+        Iterator itr=perfiles.iterator();
+        while(itr.hasNext()){
+            switch((String)itr.next()){
+                case "ADMINISTRADOR":
+                    this.panel_general.addTab("ADMINISTRADOR",panel_administrador);
+                    
+                    
+                case "VENDEDOR":
+                    
+                    this.panel_general.addTab("VENDEDOR",panel_vendedor);
+                    break;
+            }
+        }
+    
+    }
+    
+    public void setPerfil(String perfil){
+        
+            
     }
 
     /**
@@ -47,125 +93,12 @@ public class MainJFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         panel_general = new javax.swing.JTabbedPane();
-        panel_vendedor = new javax.swing.JTabbedPane();
-        panel_administrador = new javax.swing.JTabbedPane();
-        panel_Inventario = new javax.swing.JTabbedPane();
-        panel_reportes = new javax.swing.JTabbedPane();
-        jPanel6 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jPanel7 = new javax.swing.JPanel();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jRadioButton5 = new javax.swing.JRadioButton();
-        jPanel8 = new javax.swing.JPanel();
-        jRadioButton6 = new javax.swing.JRadioButton();
-        jRadioButton7 = new javax.swing.JRadioButton();
-        jRadioButton8 = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Farma La Carmela");
-        setPreferredSize(new java.awt.Dimension(750, 500));
+        setPreferredSize(new java.awt.Dimension(750, 530));
 
         panel_general.setToolTipText("");
-
-        panel_vendedor.setTabPlacement(javax.swing.JTabbedPane.LEFT);
-        panel_general.addTab("Vendedor", panel_vendedor);
-
-        panel_administrador.setTabPlacement(javax.swing.JTabbedPane.LEFT);
-        panel_administrador.addTab("Inventario", panel_Inventario);
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 598, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        panel_reportes.addTab("Ganancias", jPanel6);
-
-        jRadioButton3.setText("jRadioButton3");
-
-        jRadioButton4.setText("jRadioButton4");
-
-        jRadioButton5.setText("jRadioButton5");
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addComponent(jRadioButton3)
-                .addGap(44, 44, 44)
-                .addComponent(jRadioButton4)
-                .addGap(61, 61, 61)
-                .addComponent(jRadioButton5)
-                .addContainerGap(167, Short.MAX_VALUE))
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButton5)
-                    .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jRadioButton3)
-                        .addComponent(jRadioButton4)))
-                .addContainerGap(335, Short.MAX_VALUE))
-        );
-
-        panel_reportes.addTab("Productos", jPanel7);
-
-        jRadioButton6.setText("jRadioButton6");
-
-        jRadioButton7.setText("jRadioButton7");
-
-        jRadioButton8.setText("jRadioButton8");
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addGap(77, 77, 77)
-                .addComponent(jRadioButton6)
-                .addGap(51, 51, 51)
-                .addComponent(jRadioButton7)
-                .addGap(48, 48, 48)
-                .addComponent(jRadioButton8)
-                .addContainerGap(172, Short.MAX_VALUE))
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton6)
-                    .addComponent(jRadioButton7)
-                    .addComponent(jRadioButton8))
-                .addContainerGap(335, Short.MAX_VALUE))
-        );
-
-        panel_reportes.addTab("Medicinas", jPanel8);
-
-        panel_administrador.addTab("Reportes", panel_reportes);
-
-        panel_general.addTab("Administrador", panel_administrador);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -183,60 +116,13 @@ public class MainJFrame extends javax.swing.JFrame {
 
     public void controller(ActionListener ctr1,KeyListener ctr2,ListSelectionListener ctr3){
         panelArticulo.controller(ctr1,ctr2,ctr3);
-        panelSale.controller(ctr1);
+        panelSale.controller(ctr1,ctr2);
     }
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        
-        
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainJFrame().setVisible(true);
-            }
-        });
-    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JRadioButton jRadioButton5;
-    private javax.swing.JRadioButton jRadioButton6;
-    private javax.swing.JRadioButton jRadioButton7;
-    private javax.swing.JRadioButton jRadioButton8;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTabbedPane panel_Inventario;
-    private javax.swing.JTabbedPane panel_administrador;
     private javax.swing.JTabbedPane panel_general;
-    private javax.swing.JTabbedPane panel_reportes;
-    private javax.swing.JTabbedPane panel_vendedor;
     // End of variables declaration//GEN-END:variables
 }
